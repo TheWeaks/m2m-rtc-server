@@ -1,0 +1,22 @@
+server:
+  port: 8443
+  ssl:
+    key-store: classpath:keystore.jks
+    key-store-password: kurento
+    keyStoreType: JKS
+    keyAlias: kurento-selfsigned
+    enabled: true
+logging:
+#  path: ./logs/
+  level: trace
+spring:
+  output:
+    ansi:
+      enabled: detect
+#  datasource:
+#    url: jdbc:mysql:///
+#    username:
+#    password:
+#    driver-class-name: com.mysql.cj.jdbc.Driver
+#debug: true
+#trace: true
