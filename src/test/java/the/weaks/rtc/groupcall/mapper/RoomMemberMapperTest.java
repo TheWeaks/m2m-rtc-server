@@ -43,6 +43,7 @@ public class RoomMemberMapperTest {
         RoomMember roomMember = new RoomMember("1", "1",
                 new Date(new java.util.Date().getTime()));
         System.out.println(roomMemberMapper.join(roomMember));
+        System.out.println(roomMember.getId());
     }
 
 }

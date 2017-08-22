@@ -1,6 +1,7 @@
 # API 规范
 
 服务器地址：wss://192.168.22.145:8443/groupcall
+数据库服务器地址:jdbc:mysql://192.168.22.145:3306/WeaksCall?useSSL=false&useUnicode=yes&characterEncoding=UTF-8&zeroDateTimeBehavior=convertToNull
 
 客户端发送数据规范（json）：
 
@@ -58,6 +59,7 @@
 | 当有人在 room 上传了文件时 | type | string | 'fileUploaded' | 请求名
 |                         | userId | number | —— | 上传文件的用户id
 |                         | fileName | string | '' | 文件名
+|                         | fileType | string | —— | 文件类型
 |                         | fileUrl | string | —— | 文件服务器提供的路径
 | | | | | |
 | 服务器无法识别消息类型时 | type | string | 'unrecognizedMessage' | 请求名 

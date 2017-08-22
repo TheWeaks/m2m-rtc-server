@@ -44,7 +44,7 @@ public class UserMapperTest {
     @Test
     @Rollback
     public void insert() {
-        System.out.println("number:"+userMapper.insertUser(UUID.randomUUID().toString(),
+        System.out.println("number:"+userMapper.insertUser("2",UUID.randomUUID().toString(),
                 UUID.randomUUID().toString(),
                 UUID.randomUUID().toString()));
     }

@@ -24,7 +24,10 @@ import org.kurento.client.Continuation;
 import org.kurento.client.MediaPipeline;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.socket.WebSocketSession;
+import the.weaks.rtc.groupcall.mapper.FileMapper;
+import the.weaks.rtc.groupcall.module.FileInfo;
 import the.weaks.rtc.groupcall.module.Room;
 import the.weaks.rtc.groupcall.module.User;
 
@@ -34,6 +37,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -48,6 +52,9 @@ public class RoomSession implements Closeable {
     private final ConcurrentMap<Number, UserSession> participants = new ConcurrentHashMap<>();
     private final MediaPipeline pipeline;
     private final Number roomId;
+
+    @Autowired
+    private FileMapper fileMapper;
 
     public Number getRoomId() {
         return roomId;
@@ -147,18 +154,27 @@ public class RoomSession implements Closeable {
         textMsg.addProperty("type", "receiveTextMessage");
         textMsg.addProperty("userId", sender);
         textMsg.addProperty("message", message);
-        //todo:insert into database
         broadcast(textMsg);
     }
 
-    public void sendFileURL(Number sender, String fileName, String fileUrl) throws IOException {
+    public String sendFileURL(Number sender, String fileName, String fileUrl,String fileType) throws IOException {
         JsonObject fileURLMsg = new JsonObject();
         fileURLMsg.addProperty("type", "fileUploaded");
         fileURLMsg.addProperty("userId", sender);
         fileURLMsg.addProperty("fileName", fileName);
-        fileURLMsg.addProperty("message", fileUrl);
-        //todo:insert into database
+        fileURLMsg.addProperty("fileUrl", fileUrl);
+        fileURLMsg.addProperty("fileType",fileType);
+        String fid =UUID.randomUUID().toString();
+        FileInfo fileInfo = new FileInfo();
+        fileInfo.setFid(fid);
+        fileInfo.setFname(fileName);
+        fileInfo.setUrl(fileUrl);
+        fileInfo.setUid(sender.toString());
+        fileInfo.setRid(this.roomId.toString());
+        fileInfo.setFtype(fileType);
+        fileMapper.newFileLog(fileInfo);
         broadcast(fileURLMsg);
+        return fid;
     }
 
     public void broadcast(JsonObject message) throws IOException {

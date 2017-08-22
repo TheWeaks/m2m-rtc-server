@@ -7,4 +7,58 @@ package the.weaks.rtc.groupcall.module;
  * @since 1.7
  */
 public class FileInfo {
+    private String fid;
+    private String uid;
+    private String rid;
+    private String ftype;
+    private String fname;
+    private String url;
+
+    public String getFid() {
+        return fid;
+    }
+
+    public void setFid(String fid) {
+        this.fid = fid;
+    }
+
+    public String getUid() {
+        return uid;
+    }
+
+    public void setUid(String uid) {
+        this.uid = uid;
+    }
+
+    public String getRid() {
+        return rid;
+    }
+
+    public void setRid(String rid) {
+        this.rid = rid;
+    }
+
+    public String getFtype() {
+        return ftype;
+    }
+
+    public void setFtype(String ftype) {
+        this.ftype = ftype;
+    }
+
+    public String getFname() {
+        return fname;
+    }
+
+    public void setFname(String fname) {
+        this.fname = fname;
+    }
+
+    public String getUrl() {
+        return url;
+    }
+
+    public void setUrl(String url) {
+        this.url = url;
+    }
 }

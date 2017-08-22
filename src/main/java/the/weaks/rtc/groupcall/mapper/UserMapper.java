@@ -16,11 +16,12 @@ import the.weaks.rtc.groupcall.module.User;
 @Mapper
 @Component
 public interface UserMapper {
-    @Select("SELECT * FROM USER WHERE NAME = #{name}")
+    @Select("SELECT * FROM WeaksCall.User WHERE NAME = #{name}")
     User findByName(@Param("name") String name);
-    @Select("SELECT * FROM USER WHERE uid = #{uid}")
+    @Select("SELECT * FROM WeaksCall.User WHERE uid = #{uid}")
     User findByUid(@Param("uid") String name);
-    @Insert("INSERT  USER (name,prefix,suffix) " +
-            "VALUES (#{name},#{prefix},#{suffix})")
-    int insertUser(@Param("name")String name,@Param("prefix")String prefix,@Param("suffix")String suffix);
+    @Insert("INSERT  WeaksCall.User (uid,name,prefix,suffix) " +
+            "VALUES (#{uid},#{name},#{prefix},#{suffix})")
+    int insertUser(@Param("uid")String uid,@Param("name")String name,
+                   @Param("prefix")String prefix,@Param("suffix")String suffix);
 }
