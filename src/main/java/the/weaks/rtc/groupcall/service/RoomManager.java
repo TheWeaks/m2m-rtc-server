@@ -15,16 +15,23 @@
  *
  */
 
-package the.weaks.rtc.groupcall.manager;
-
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
+package the.weaks.rtc.groupcall.service;
 
 import org.kurento.client.KurentoClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
+import the.weaks.rtc.groupcall.exception.PermissionDeniedException;
+import the.weaks.rtc.groupcall.mapper.RoomMapper;
+import the.weaks.rtc.groupcall.mapper.RoomMemberMapper;
+import the.weaks.rtc.groupcall.module.Room;
+import the.weaks.rtc.groupcall.module.RoomMember;
 import the.weaks.rtc.groupcall.session.RoomSession;
+
+import java.sql.Date;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 /**
  * @author Ivan Gracia (izanmail@gmail.com)
@@ -36,6 +43,12 @@ public class RoomManager {
 
     @Autowired
     private KurentoClient kurento;
+
+    @Autowired
+    private RoomMapper roomMapper;
+
+    @Autowired
+    private RoomMemberMapper roomMemberMapper;
 
     private final ConcurrentMap<Number, RoomSession> rooms = new ConcurrentHashMap<>();
 
@@ -52,7 +65,7 @@ public class RoomManager {
 
         if (roomSession == null) {
             log.debug("RoomSession {} not existent. Will create now!", roomId);
-            roomSession = createRoom(roomId);
+            roomSession = startRoom(roomId);
         }
         log.debug("RoomSession {} found!", roomId);
 
@@ -64,17 +77,44 @@ public class RoomManager {
      *
      * @param roomSession the roomSession to be removed
      */
-    public void removeRoom(RoomSession roomSession) {
+    public void pauseRoom(RoomSession roomSession) {
         this.rooms.remove(roomSession.getRoomId());
         roomSession.close();
         log.info("RoomSession {} removed and closed", roomSession.getRoomId());
     }
 
-    public RoomSession createRoom(Number roomId) {
+    public RoomSession startRoom(Number roomId) {
         RoomSession roomSession = rooms.get(roomId);
+        Room room = null;
         if (roomSession == null)
-            roomSession = new RoomSession(roomId, kurento.createMediaPipeline());
-        rooms.put(roomId, roomSession);
+            room = this.findByRid(roomId);
+        roomSession = new RoomSession(room, kurento.createMediaPipeline());
+        rooms.put(roomId.intValue(), roomSession);
         return roomSession;
+    }
+
+    @Transactional
+    public void createRoom(String orderNum, Integer state) {
+        roomMapper.createRoom(orderNum, new Date(new java.util.Date().getTime()), state);
+    }
+
+    @Transactional
+    Room findByRid(Number rid) {
+        return roomMapper.findByRid(rid.toString());
+//        return new Room(rid);
+
+    }
+
+    public void checkExist(Number rid, Number uid) throws PermissionDeniedException {
+        if (roomMemberMapper.count(rid.toString(), uid.toString()) == 0) {
+            throw new PermissionDeniedException(uid, rid);
+        }
+    }
+
+    @Transactional
+    public int put(String rid, String uid) {
+        RoomMember roomMember = new RoomMember(rid, uid,
+                new Date(new java.util.Date().getTime()));
+        return roomMemberMapper.join(roomMember);
     }
 }

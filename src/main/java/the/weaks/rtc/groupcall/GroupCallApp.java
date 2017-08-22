@@ -17,54 +17,16 @@
 
 package the.weaks.rtc.groupcall;
 
-import org.kurento.client.KurentoClient;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.annotation.Bean;
-import org.springframework.web.socket.config.annotation.EnableWebSocket;
-import org.springframework.web.socket.config.annotation.WebSocketConfigurer;
-import org.springframework.web.socket.config.annotation.WebSocketHandlerRegistry;
-import the.weaks.rtc.groupcall.controller.CallHandler;
-import the.weaks.rtc.groupcall.manager.RoomManager;
-import the.weaks.rtc.groupcall.manager.UserRegistry;
 
 /**
  * @author Ivan Gracia (izanmail@gmail.com)
  * @since 4.3.1
  */
 @SpringBootApplication
-@EnableWebSocket
-public class GroupCallApp implements WebSocketConfigurer {
-
-    @Bean
-    public UserRegistry registry() {
-        return new UserRegistry();
-    }
-
-    @Bean
-    public RoomManager roomManager() {
-        return new RoomManager();
-    }
-
-    @Bean
-    public CallHandler groupCallHandler() {
-        return new CallHandler();
-    }
-
-    @Bean
-    public KurentoClient kurentoClient() {
-         return KurentoClient.create("ws://192.168.22.145:8888/kurento");
-//        return KurentoClient.create("ws://123.206.29.201:6666/kurento");
-//        return KurentoClient.create();
-    }
-
+public class GroupCallApp {
     public static void main(String[] args) throws Exception {
         SpringApplication.run(GroupCallApp.class, args);
-    }
-
-    @Override
-    public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
-        registry.addHandler(groupCallHandler(), "/groupcall")
-                .setAllowedOrigins("*");
     }
 }

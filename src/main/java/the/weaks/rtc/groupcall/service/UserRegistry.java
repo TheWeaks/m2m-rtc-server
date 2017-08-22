@@ -15,14 +15,18 @@
  *
  */
 
-package the.weaks.rtc.groupcall.manager;
-
-import java.util.concurrent.ConcurrentHashMap;
+package the.weaks.rtc.groupcall.service;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.socket.WebSocketSession;
+import the.weaks.rtc.groupcall.exception.UserNotFoundException;
+import the.weaks.rtc.groupcall.mapper.UserMapper;
+import the.weaks.rtc.groupcall.module.User;
 import the.weaks.rtc.groupcall.session.UserSession;
+
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Map of users registered in the system. This class has a concurrent hash map to store users, using
@@ -35,6 +39,8 @@ import the.weaks.rtc.groupcall.session.UserSession;
  * @since 4.3.1
  */
 public class UserRegistry {
+    @Autowired
+    private UserMapper userMapper;
 
     private final ConcurrentHashMap<Number, UserSession> usersById = new ConcurrentHashMap<>();
     private final ConcurrentHashMap<String, UserSession> usersBySessionId = new ConcurrentHashMap<>();
@@ -42,7 +48,7 @@ public class UserRegistry {
     private static final Logger log = LoggerFactory.getLogger(UserRegistry.class);
 
     public void register(UserSession user) {
-        log.debug("creating user session for" + user.getUserId());
+        log.info("creating user session for {}",user.getUserId());
         usersById.put(user.getUserId(), user);
         usersBySessionId.put(user.getSession().getId(), user);
     }
@@ -55,20 +61,23 @@ public class UserRegistry {
         return usersBySessionId.get(session.getId());
     }
 
-    public boolean exists(Number userId) {
-        return usersById.get(userId)!=null;
-    }
-
-    public boolean exists(UserSession user) {
-        return user != null && usersById.values().contains(user);
-    }
-
     public UserSession removeBySession(WebSocketSession session) {
         final UserSession user = getBySession(session);
-        log.info("user {} is exit",user);
         usersBySessionId.remove(session.getId());
-        if(user!=null)
+        if(user!=null) {
             usersById.remove(user.getUserId());
+        }
+
         return user;
+    }
+
+    public User findByUid(Number uid) throws UserNotFoundException {
+        User user = userMapper.findByUid(uid.toString());
+        if (user==null){
+            throw new UserNotFoundException(uid);
+        }
+//        User user = new User(uid.toString());
+        return user;
+
     }
 }

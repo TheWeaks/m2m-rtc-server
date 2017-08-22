@@ -30,10 +30,9 @@ import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
 import the.weaks.rtc.groupcall.exception.PermissionDeniedException;
 import the.weaks.rtc.groupcall.exception.UserNotFoundException;
-import the.weaks.rtc.groupcall.manager.RoomManager;
-import the.weaks.rtc.groupcall.manager.UserRegistry;
-import the.weaks.rtc.groupcall.module.Room;
 import the.weaks.rtc.groupcall.module.User;
+import the.weaks.rtc.groupcall.service.RoomManager;
+import the.weaks.rtc.groupcall.service.UserRegistry;
 import the.weaks.rtc.groupcall.session.RoomSession;
 import the.weaks.rtc.groupcall.session.UserSession;
 
@@ -59,46 +58,56 @@ public class CallHandler extends TextWebSocketHandler {
     @Override
     public void handleTextMessage(WebSocketSession session, TextMessage message) throws IOException {
         final JsonObject jsonMessage = gson.fromJson(message.getPayload(), JsonObject.class);
-        final UserSession user = registry.getBySession(session);
-        if (user != null) {
-            log.debug("Incoming message from user '{}': {}", user.getUserId(), jsonMessage);
-        } else {
-            log.debug("Incoming message from new user: {}", jsonMessage);
-        }
-        log.info("received message type {}", jsonMessage.get("type").getAsString());
-        switch (jsonMessage.get("type").getAsString()) {
-            case "join":
-                joinRoom(jsonMessage, session);
-                break;
-            case "receiveVideoFrom":
-                final Number senderName = jsonMessage.get("userId").getAsNumber();
-                final UserSession sender = registry.getById(senderName);
-                final String sdpOffer = jsonMessage.get("sdpOffer").getAsString();
-                if (user == null)
+        log.info("message:{}",jsonMessage);
+        try {
+            final UserSession user = registry.getBySession(session);
+            if (user != null) {
+                log.debug("Incoming message from user '{}': {}", user.getUserId(), jsonMessage);
+            } else {
+                log.debug("Incoming message from new user: {}", jsonMessage);
+            }
+            switch (jsonMessage.get("type").getAsString()) {
+                case "join":
+                    joinRoom(jsonMessage, session);
                     break;
-                user.receiveVideoFrom(sender, sdpOffer);
-                break;
-            case "onIceCandidate":
-                JsonObject candidate = jsonMessage.get("candidate").getAsJsonObject();
+                case "receiveVideoFrom":
+                    final Number senderId = jsonMessage.get("userId").getAsNumber();
+                    final UserSession sender = registry.getById(senderId);
+                    final String sdpOffer = jsonMessage.get("sdpOffer").getAsString();
+                    if (user == null)
+                        break;
+                    user.receiveVideoFrom(sender, sdpOffer);
+                    break;
+                case "onIceCandidate":
+                    JsonObject candidate = jsonMessage.get("candidate").getAsJsonObject();
 
-                if (user != null) {
-                    IceCandidate cand = new IceCandidate(candidate.get("candidate").getAsString(),
-                            candidate.get("sdpMid").getAsString(), candidate.get("sdpMLineIndex").getAsInt());
-                    user.addCandidate(cand, jsonMessage.get("userId").getAsNumber());
-                }
-                break;
-            case "sendMessage":
-                sendMessage(user, jsonMessage);
-                break;
-            case "uploadSuccess":
-                sendFileURL(user, jsonMessage);
-                break;
-            case "leave":
-                session.close();
-                break;
-            default:
-                broadcast(jsonMessage, user);
-                break;
+                    if (user != null) {
+                        IceCandidate cand = new IceCandidate(candidate.get("candidate").getAsString(),
+                                candidate.get("sdpMid").getAsString(), candidate.get("sdpMLineIndex").getAsInt());
+                        user.addCandidate(cand, jsonMessage.get("userId").getAsNumber());
+                    }
+                    break;
+                case "sendMessage":
+                    sendMessage(user, jsonMessage);
+                    break;
+                case "uploadSuccess":
+                    sendFileURL(user, jsonMessage);
+                    break;
+                case "leave":
+                    session.close();
+                    break;
+                default:
+                    broadcast(jsonMessage, user);
+                    break;
+            }
+        }catch (NullPointerException e)
+        {
+            log.warn("unrecognizedMessage");
+            JsonObject error = new JsonObject();
+            error.addProperty("type", "unrecognizedMessage");
+            error.add("message",jsonMessage);
+            session.sendMessage(new TextMessage(error.toString()));
+            e.printStackTrace();
         }
     }
 
@@ -119,8 +128,8 @@ public class CallHandler extends TextWebSocketHandler {
         final Number userId = params.get("userId").getAsNumber();
         log.info("PARTICIPANT {}: trying to join room {}", userId, roomId);
         try {
-            User u = User.getUser(userId);
-            Room.getRoom(roomId).checkExist(u);
+            User u = registry.findByUid(userId);
+            roomManager.checkExist(roomId,userId);
             final UserSession user = roomManager.getRoom(roomId).join(u, session);
             registry.register(user);
         } catch (UserNotFoundException e) {
@@ -146,7 +155,7 @@ public class CallHandler extends TextWebSocketHandler {
         final RoomSession roomSession = roomManager.getRoom(user.getRoomId());
         roomSession.leave(user);
         if (roomSession.getParticipants().isEmpty()) {
-            roomManager.removeRoom(roomSession);
+            roomManager.pauseRoom(roomSession);
         }
 
     }

@@ -13,10 +13,17 @@ spring:
   output:
     ansi:
       enabled: detect
-#  datasource:
-#    url: jdbc:mysql:///
-#    username:
-#    password:
-#    driver-class-name: com.mysql.cj.jdbc.Driver
+  datasource:
+    url: jdbc:mysql:///WeaksCall?useSSL=false&useUnicode=yes&characterEncoding=UTF-8&zeroDateTimeBehavior=convertToNull
+    username: root
+    password:
+    driver-class-name: com.mysql.jdbc.Driver
 #debug: true
 #trace: true
+
+mybatis:
+  configuration:
+    map-underscore-to-camel-case: true
+    use-column-label: true
+    use-generated-keys: true
+#  mapper-locations: classpath:mapper/*.xml

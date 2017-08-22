@@ -1,7 +1,6 @@
 package the.weaks.rtc.groupcall.module;
 
 import com.google.gson.JsonObject;
-import the.weaks.rtc.groupcall.exception.UserNotFoundException;
 
 import java.io.Serializable;
 import java.util.UUID;
@@ -13,16 +12,10 @@ import java.util.UUID;
  * @since 1.7
  */
 public class User implements Serializable {
-    public static User getUser(Number userId) throws UserNotFoundException {
-        if (userId.intValue() < 0)
-            throw new UserNotFoundException(userId);
-        return new User(userId);
-    }
-
     private String prefix;
     private String suffix;
     private String name;
-    private Number id;
+    private Integer id;
 
     public String getPrefix() {
         return prefix;
@@ -48,11 +41,18 @@ public class User implements Serializable {
         this.id = id;
     }
 
-    private User(Number id) {
-        this.id = id;
-        this.name = UUID.randomUUID().toString();
+    public User(String id, String name, String prefix, String suffix) {
+        this.prefix = prefix;
+        this.suffix = suffix;
+        this.name = name;
+        this.id = Integer.valueOf(id);
+    }
+
+    public User(String id) {
         this.prefix = UUID.randomUUID().toString();
         this.suffix = UUID.randomUUID().toString();
+        this.name = UUID.randomUUID().toString();
+        this.id = Integer.valueOf(id);
     }
 
     public String getName() {
@@ -83,5 +83,10 @@ public class User implements Serializable {
         user.addProperty("prefix", this.getPrefix());
         user.addProperty("suffix", this.getSuffix());
         return user;
+    }
+
+    @Override
+    public String toString() {
+        return "User:" + toJson().toString();
     }
 }

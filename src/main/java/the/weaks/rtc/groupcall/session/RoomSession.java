@@ -25,6 +25,7 @@ import org.kurento.client.MediaPipeline;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.socket.WebSocketSession;
+import the.weaks.rtc.groupcall.module.Room;
 import the.weaks.rtc.groupcall.module.User;
 
 import javax.annotation.PreDestroy;
@@ -52,10 +53,10 @@ public class RoomSession implements Closeable {
         return roomId;
     }
 
-    public RoomSession(Number roomName, MediaPipeline pipeline) {
-        this.roomId = roomName;
+    public RoomSession(Room room, MediaPipeline pipeline) {
+        this.roomId = room.getRoomId();
         this.pipeline = pipeline;
-        log.info("ROOM {} has been created", roomName);
+        log.info("ROOM {} has been created", room.getRoomId());
     }
 
     @PreDestroy
