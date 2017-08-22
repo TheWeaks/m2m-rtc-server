@@ -28,7 +28,7 @@ CREATE TABLE `File` (
   `fid`   VARCHAR(64)  NOT NULL DEFAULT '',
   `uid`   VARCHAR(64)  NOT NULL DEFAULT '',
   `rid`   VARCHAR(64)           DEFAULT NULL,
-  `ftype` INT(11)               DEFAULT NULL,
+  `ftype` VARCHAR(64)           DEFAULT NULL,
   `fname` VARCHAR(256) NOT NULL DEFAULT '',
   `url`   VARCHAR(256) NOT NULL DEFAULT '',
   PRIMARY KEY (`fid`),
