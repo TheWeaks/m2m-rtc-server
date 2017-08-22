@@ -31,6 +31,7 @@ import org.springframework.web.socket.handler.TextWebSocketHandler;
 import the.weaks.rtc.groupcall.exception.PermissionDeniedException;
 import the.weaks.rtc.groupcall.exception.UserNotFoundException;
 import the.weaks.rtc.groupcall.module.User;
+import the.weaks.rtc.groupcall.service.HistoryService;
 import the.weaks.rtc.groupcall.service.RoomManager;
 import the.weaks.rtc.groupcall.service.UserRegistry;
 import the.weaks.rtc.groupcall.session.RoomSession;
@@ -55,10 +56,13 @@ public class CallHandler extends TextWebSocketHandler {
     @Autowired
     private UserRegistry registry;
 
+    @Autowired
+    private HistoryService historyService;
+
     @Override
     public void handleTextMessage(WebSocketSession session, TextMessage message) throws IOException {
         final JsonObject jsonMessage = gson.fromJson(message.getPayload(), JsonObject.class);
-        log.info("message:{}",jsonMessage);
+        log.info("message:{}", jsonMessage);
         try {
             final UserSession user = registry.getBySession(session);
             if (user != null) {
@@ -100,12 +104,11 @@ public class CallHandler extends TextWebSocketHandler {
                     broadcast(jsonMessage, user);
                     break;
             }
-        }catch (NullPointerException e)
-        {
+        } catch (NullPointerException e) {
             log.warn("unrecognizedMessage");
             JsonObject error = new JsonObject();
             error.addProperty("type", "unrecognizedMessage");
-            error.add("message",jsonMessage);
+            error.add("message", jsonMessage);
             session.sendMessage(new TextMessage(error.toString()));
             e.printStackTrace();
         }
@@ -117,10 +120,12 @@ public class CallHandler extends TextWebSocketHandler {
         if (user != null)
             try {
                 leaveRoom(user);
+                historyService.logHistory(user.getUserId().toString(),user.getRoomId().toString(),-1);
             } catch (Throwable e) {
                 e.printStackTrace();
             }
         log.info("user id {} is exit", user != null ? user.getUserId() : "null");
+
     }
 
     private void joinRoom(JsonObject params, WebSocketSession session) throws IOException {
@@ -129,9 +134,10 @@ public class CallHandler extends TextWebSocketHandler {
         log.info("PARTICIPANT {}: trying to join room {}", userId, roomId);
         try {
             User u = registry.findByUid(userId);
-            roomManager.checkExist(roomId,userId);
+            roomManager.checkExist(roomId, userId);
             final UserSession user = roomManager.getRoom(roomId).join(u, session);
             registry.register(user);
+            historyService.logHistory(user.getUserId().toString(),user.getRoomId().toString(),1);
         } catch (UserNotFoundException e) {
             log.warn(e.getMessage());
             JsonObject error = new JsonObject();
@@ -139,8 +145,7 @@ public class CallHandler extends TextWebSocketHandler {
             error.addProperty("userId", e.getUserId());
             session.sendMessage(new TextMessage(error.toString()));
             session.close();
-        }
-        catch (PermissionDeniedException e) {
+        } catch (PermissionDeniedException e) {
             log.warn(e.getMessage());
             JsonObject error = new JsonObject();
             error.addProperty("type", "permissionDeny");
@@ -165,6 +170,7 @@ public class CallHandler extends TextWebSocketHandler {
         final String msg = message.get("message").getAsString();
         final Number userId = user.getUserId();
         roomSession.sendMessage(userId, msg);
+        historyService.logHistory(user.getUserId().toString(),user.getRoomId().toString(),0,msg);
     }
 
     private void sendFileURL(UserSession user, JsonObject message) throws IOException {
@@ -172,7 +178,9 @@ public class CallHandler extends TextWebSocketHandler {
         final Number sender = message.get("userId").getAsNumber();
         final String fileName = message.get("fileName").getAsString();
         final String fileUrl = message.get("fileUrl").getAsString();
-        roomSession.sendFileURL(sender, fileName, fileUrl);
+        String fileType = message.get("fileType").getAsString();
+        String fid = roomSession.sendFileURL(sender, fileName, fileUrl, fileType);
+        historyService.logHistory(user.getUserId().toString(),user.getRoomId().toString(),0,fid);
     }
 
     private void broadcast(JsonObject object, UserSession user) throws IOException {
