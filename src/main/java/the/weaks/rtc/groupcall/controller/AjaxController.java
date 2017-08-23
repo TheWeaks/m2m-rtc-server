@@ -20,21 +20,20 @@ public class AjaxController {
     @Autowired
     private RoomManager roomManager;
 
-    @RequestMapping("/")
-    public String hello() {
-        return "hello world";
-    }
-
     @RequestMapping("/join")
-    public Map<String, Object> check(String rid) {
+    public Map<String, Object> join(String uid, String rid) {
         Map<String, Object> resp = new HashMap<>();
-        if (rid == null) {
-            resp.put("status", -1);
-            resp.put("message", "rid is null");
-        } else {
-            resp.put("status", 0);
-            resp.put("data", roomManager.getAllMember(rid));
-        }
+            try {
+                roomManager.checkExist(rid, uid);
+                resp.put("status", 0);
+                Map<String, Object> data = new HashMap<>();
+                data.put("participants", roomManager.getAllMember(rid));
+                data.put("rid", rid);
+                resp.put("data", data);
+            } catch (Exception e) {
+                resp.put("status", -1);
+                resp.put("message", "非法请求");
+            }
         return resp;
     }
 }

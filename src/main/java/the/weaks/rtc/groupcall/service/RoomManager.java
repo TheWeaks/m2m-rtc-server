@@ -113,8 +113,14 @@ public class RoomManager {
     }
 
     public void checkExist(Number rid, Number uid) throws PermissionDeniedException {
-        if (roomMemberMapper.count(rid.toString(), uid.toString()) == 0) {
+        if (rid == null || uid == null || roomMemberMapper.count(rid.toString(), uid.toString()) == 0) {
             throw new PermissionDeniedException(uid, rid);
+        }
+    }
+
+    public void checkExist(String rid, String uid) throws PermissionDeniedException {
+        if ((rid == null || uid == null || roomMemberMapper.count(rid, uid) == 0)) {
+            checkExist(Integer.valueOf(rid), Integer.valueOf(uid));
         }
     }
 
