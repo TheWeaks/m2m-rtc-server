@@ -175,11 +175,10 @@ public class CallHandler extends TextWebSocketHandler {
 
     private void sendFileURL(UserSession user, JsonObject message) throws IOException {
         final RoomSession roomSession = roomManager.getRoom(user.getRoomId());
-        final Number sender = message.get("userId").getAsNumber();
         final String fileName = message.get("fileName").getAsString();
         final String fileUrl = message.get("fileUrl").getAsString();
-        String fileType = message.get("fileType").getAsString();
-        String fid = roomSession.sendFileURL(sender, fileName, fileUrl, fileType);
+        final String fileType = message.get("fileType").getAsString();
+        String fid = roomSession.sendFileURL(user.getUserId(), fileName, fileUrl, fileType);
         historyService.logHistory(user.getUserId().toString(),user.getRoomId().toString(),0,fid);
     }
 

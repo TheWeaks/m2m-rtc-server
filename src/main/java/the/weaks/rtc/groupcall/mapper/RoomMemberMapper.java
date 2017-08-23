@@ -25,4 +25,6 @@ public interface RoomMemberMapper {
     @Insert("INSERT RoomMember(rid, uid, jointime, rmstate) VALUES (#{rid}, #{uid}, #{jointime}, #{rmstate})")
     int join(RoomMember roomMember);
 
+    @Select("SELECT * from RoomMember WHERE rid=#{rid}")
+    RoomMember[] listAll(@Param("rid")String rid);
 }

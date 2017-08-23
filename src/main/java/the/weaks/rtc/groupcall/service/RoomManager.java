@@ -25,11 +25,15 @@ import org.springframework.transaction.annotation.Transactional;
 import the.weaks.rtc.groupcall.exception.PermissionDeniedException;
 import the.weaks.rtc.groupcall.mapper.RoomMapper;
 import the.weaks.rtc.groupcall.mapper.RoomMemberMapper;
+import the.weaks.rtc.groupcall.mapper.UserMapper;
 import the.weaks.rtc.groupcall.module.Room;
 import the.weaks.rtc.groupcall.module.RoomMember;
+import the.weaks.rtc.groupcall.module.User;
 import the.weaks.rtc.groupcall.session.RoomSession;
 
 import java.sql.Date;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -49,6 +53,9 @@ public class RoomManager {
 
     @Autowired
     private RoomMemberMapper roomMemberMapper;
+
+    @Autowired
+    private UserMapper userMapper;
 
     private final ConcurrentMap<Number, RoomSession> rooms = new ConcurrentHashMap<>();
 
@@ -116,5 +123,14 @@ public class RoomManager {
         RoomMember roomMember = new RoomMember(rid, uid,
                 new Date(new java.util.Date().getTime()));
         return roomMemberMapper.join(roomMember);
+    }
+
+    @Transactional
+    public List<User> getAllMember(String rid) {
+        List<User> users = new ArrayList<>();
+        for (RoomMember roomMember : roomMemberMapper.listAll(rid)) {
+            users.add(userMapper.findByUid(roomMember.getUid()));
+        }
+        return users;
     }
 }

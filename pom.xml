@@ -2,12 +2,6 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <parent>
-        <groupId>org.kurento</groupId>
-        <artifactId>kurento-parent-pom</artifactId>
-        <version>6.6.2</version>
-    </parent>
-
     <groupId>the.weaks</groupId>
     <artifactId>group-call</artifactId>
     <version>0.0.2</version>
@@ -26,40 +20,51 @@
         <start-class>the.weaks.rtc.groupcall.GroupCallApp</start-class>
         <maven.compiler.target>1.7</maven.compiler.target>
         <maven.compiler.source>1.7</maven.compiler.source>
+        <version.kurento-maven-plugin>2.0.2</version.kurento-maven-plugin>
+        <version.kurento-utils-js>6.6.2</version.kurento-utils-js>
+        <version.spring-boot>1.4.1.RELEASE</version.spring-boot>
+        <version.spring>4.3.3.RELEASE</version.spring>
     </properties>
 
     <dependencies>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
+            <version>${version.spring-boot}</version>
         </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-websocket</artifactId>
+            <version>${version.spring}</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-devtools</artifactId>
+            <version>${version.spring-boot}</version>
             <optional>true</optional>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-actuator</artifactId>
+            <version>${version.spring-boot}</version>
             <optional>true</optional>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
+            <version>${version.spring-boot}</version>
             <scope>test</scope>
         </dependency>
         <!-- Kurento -->
         <dependency>
             <groupId>org.kurento</groupId>
             <artifactId>kurento-client</artifactId>
+            <version>${version.kurento-utils-js}</version>
         </dependency>
         <dependency>
             <groupId>org.kurento</groupId>
             <artifactId>kurento-utils-js</artifactId>
+            <version>${version.kurento-utils-js}</version>
         </dependency>
         <!--database and orm-->
         <dependency>
@@ -77,10 +82,19 @@
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-orm</artifactId>
+            <version>${version.spring}</version>
         </dependency>
     </dependencies>
 
     <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-maven-plugin</artifactId>
+                </plugin>
+            </plugins>
+        </pluginManagement>
         <plugins>
             <plugin>
                 <groupId>org.springframework.boot</groupId>
@@ -162,9 +176,6 @@
                     </plugin>
                 </plugins>
             </build>
-        </profile>
-        <profile>
-            <id>no-assembly</id>
         </profile>
     </profiles>
 </project>

@@ -45,5 +45,11 @@ public class RoomMemberMapperTest {
         System.out.println(roomMemberMapper.join(roomMember));
         System.out.println(roomMember.getId());
     }
+    @Test
+    public void listAll(){
+        for (RoomMember roomMember : roomMemberMapper.listAll("1")) {
+            System.out.println(roomMember.getUid());
+        }
+    }
 
 }

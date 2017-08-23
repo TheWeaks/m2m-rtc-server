@@ -15,6 +15,9 @@ public class RoomMember {
     private Date joinTime;
     private Integer rmState;
 
+    public RoomMember() {
+    }
+
     public RoomMember(String rid, String uid, Date joinTime) {
         this.rid = rid;
         this.uid = uid;

@@ -19,7 +19,7 @@ public interface UserMapper {
     @Select("SELECT * FROM WeaksCall.User WHERE NAME = #{name}")
     User findByName(@Param("name") String name);
     @Select("SELECT * FROM WeaksCall.User WHERE uid = #{uid}")
-    User findByUid(@Param("uid") String name);
+    User findByUid(@Param("uid") String id);
     @Insert("INSERT  WeaksCall.User (uid,name,prefix,suffix) " +
             "VALUES (#{uid},#{name},#{prefix},#{suffix})")
     int insertUser(@Param("uid")String uid,@Param("name")String name,
