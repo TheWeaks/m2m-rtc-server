@@ -10,13 +10,16 @@ import java.util.UUID;
  * @since 1.7
  */
 public class Room {
-    private final Integer roomId;
-    private final String orderNum;
+    private Integer roomId;
+    private String orderNum;
     private Date date;
-    private Number rState;
+    private Integer rState;
 
-    public Room(String roomId, String orderNum, java.sql.Date date, Integer rState) {
-        this.roomId = Integer.valueOf(roomId);
+    public Room(Integer roomId, String orderNum, java.sql.Date date, Integer rState) {
+        if (roomId == null)
+            this.roomId = null;
+        else
+            this.roomId = roomId;
         this.orderNum = orderNum;
         if (date == null)
             this.date = null;
@@ -32,8 +35,44 @@ public class Room {
 
     }
 
+    public Room(String orderNum, java.sql.Date date, Integer rState) {
+        this.orderNum = orderNum;
+        if (date == null)
+            this.date = null;
+        else
+            this.date = new Date(date.getTime());
+        this.rState = rState;
+    }
+
     public Number getRoomId() {
         return roomId;
     }
 
+    public Integer getrState() {
+        return rState;
+    }
+
+    public void setrState(Integer rState) {
+        this.rState = rState;
+    }
+
+    public Date getDate() {
+        return date;
+    }
+
+    public void setDate(Date date) {
+        this.date = date;
+    }
+
+    public void setRoomId(Integer roomId) {
+        this.roomId = roomId;
+    }
+
+    public String getOrderNum() {
+        return orderNum;
+    }
+
+    public void setOrderNum(String orderNum) {
+        this.orderNum = orderNum;
+    }
 }

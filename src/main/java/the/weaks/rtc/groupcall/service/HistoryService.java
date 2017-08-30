@@ -16,19 +16,17 @@ public class HistoryService {
     @Autowired
     private HistoryMapper historyMapper;
 
-    public int logHistory(String uid, String rid, int type, String message) {
+    public int logHistory(String uid, Number rid, int type, String message) {
         History history = new History();
         history.setUid(uid);
         history.setRid(rid);
         history.setDate(new java.sql.Date(new java.util.Date().getTime()));
-        history.setHtype(type);
+        history.sethType(type);
         history.setMessage(message);
         return historyMapper.logHistory(history);
-
-
     }
 
-    public int logHistory(String uid, String rid, int type) {
+    public int logHistory(String uid, Number rid, int type) {
         return logHistory(uid, rid, type, null);
     }
 }

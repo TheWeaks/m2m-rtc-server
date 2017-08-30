@@ -27,7 +27,7 @@ DROP TABLE IF EXISTS `File`;
 CREATE TABLE `File` (
   `fid`   VARCHAR(64)  NOT NULL DEFAULT '',
   `uid`   VARCHAR(64)  NOT NULL DEFAULT '',
-  `rid`   VARCHAR(64)           DEFAULT NULL,
+  `rid`   INT(11)               DEFAULT 0,
   `ftype` VARCHAR(64)           DEFAULT NULL,
   `fname` VARCHAR(256) NOT NULL DEFAULT '',
   `url`   VARCHAR(256) NOT NULL DEFAULT '',
@@ -49,7 +49,7 @@ DROP TABLE IF EXISTS `History`;
 
 CREATE TABLE `History` (
   `id`      INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
-  `rid`     VARCHAR(64)      NOT NULL DEFAULT '',
+  `rid`     INT(11)          NOT NULL DEFAULT 0,
   `uid`     VARCHAR(64)               DEFAULT '',
   `date`    VARCHAR(64)      NOT NULL DEFAULT '',
   `htype`   INT(11)                   DEFAULT NULL,
@@ -71,10 +71,10 @@ CREATE TABLE `History` (
 DROP TABLE IF EXISTS `Room`;
 
 CREATE TABLE `Room` (
-  `rid`      VARCHAR(64) NOT NULL DEFAULT '',
-  `ordernum` VARCHAR(64)          DEFAULT NULL,
-  `date`     DATE        NOT NULL,
-  `rstate`   INT(11)              DEFAULT NULL,
+  `rid`      INT(11) NOT NULL   AUTO_INCREMENT,
+  `ordernum` VARCHAR(64) UNIQUE DEFAULT NULL,
+  `date`     DATE    NOT NULL,
+  `rstate`   INT(11)            DEFAULT NULL,
   PRIMARY KEY (`rid`)
 )
   ENGINE = InnoDB
@@ -86,7 +86,7 @@ LOCK TABLES `Room` WRITE;
 
 INSERT INTO `Room` (`rid`, `ordernum`, `date`, `rstate`)
 VALUES
-  ('1', '343caf5e-b702-4d60-9f2a-4f8c442bee53', '0000-00-00', NULL);
+  (1, '343caf5e-b702-4d60-9f2a-4f8c442bee53', '0000-00-00', NULL);
 
 /*!40000 ALTER TABLE `Room`
   ENABLE KEYS */;
@@ -99,7 +99,7 @@ DROP TABLE IF EXISTS `RoomMember`;
 
 CREATE TABLE `RoomMember` (
   `id`       INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
-  `rid`      VARCHAR(64)      NOT NULL DEFAULT '',
+  `rid`      INT(11)          NOT NULL DEFAULT 0,
   `uid`      VARCHAR(64)      NOT NULL DEFAULT '',
   `jointime` DATE             NOT NULL,
   `rmstate`  INT(11)                   DEFAULT NULL,

@@ -10,7 +10,7 @@ import java.sql.Date;
  */
 public class RoomMember {
     private int id;
-    private String rid;
+    private Integer rid;
     private String uid;
     private Date joinTime;
     private Integer rmState;
@@ -18,8 +18,8 @@ public class RoomMember {
     public RoomMember() {
     }
 
-    public RoomMember(String rid, String uid, Date joinTime) {
-        this.rid = rid;
+    public RoomMember(Number rid, String uid, Date joinTime) {
+        this.rid = rid.intValue();
         this.uid = uid;
         this.joinTime = joinTime;
     }
@@ -32,12 +32,12 @@ public class RoomMember {
         this.id = id;
     }
 
-    public String getRid() {
+    public Integer getRid() {
         return rid;
     }
 
-    public void setRid(String rid) {
-        this.rid = rid;
+    public void setRid(Number rid) {
+        this.rid = rid.intValue();
     }
 
     public String getUid() {

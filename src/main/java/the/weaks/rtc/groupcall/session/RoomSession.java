@@ -170,7 +170,7 @@ public class RoomSession implements Closeable {
         fileInfo.setFname(fileName);
         fileInfo.setUrl(fileUrl);
         fileInfo.setUid(sender.toString());
-        fileInfo.setRid(this.roomId.toString());
+        fileInfo.setRid(this.roomId);
         fileInfo.setFtype(fileType);
         fileMapper.newFileLog(fileInfo);
         broadcast(fileURLMsg);

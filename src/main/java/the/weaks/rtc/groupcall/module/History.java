@@ -10,10 +10,10 @@ import java.sql.Date;
  */
 public class History {
     private int id;
-    private String rid;
+    private Integer rid;
     private String uid;
     private Date date;
-    private int htype;
+    private int hType;
     private String message;
 
     public int getId() {
@@ -24,11 +24,15 @@ public class History {
         this.id = id;
     }
 
-    public String getRid() {
+    public Integer getRid() {
         return rid;
     }
 
-    public void setRid(String rid) {
+    public void setRid(Number rid) {
+        this.rid = rid.intValue();
+    }
+
+    public void setRid(Integer rid) {
         this.rid = rid;
     }
 
@@ -48,12 +52,12 @@ public class History {
         this.date = date;
     }
 
-    public int getHtype() {
-        return htype;
+    public int gethType() {
+        return hType;
     }
 
-    public void setHtype(int htype) {
-        this.htype = htype;
+    public void sethType(int hType) {
+        this.hType = hType;
     }
 
     public String getMessage() {
@@ -63,4 +67,6 @@ public class History {
     public void setMessage(String message) {
         this.message = message;
     }
+
+
 }

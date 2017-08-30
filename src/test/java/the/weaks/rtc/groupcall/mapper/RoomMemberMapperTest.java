@@ -29,25 +29,25 @@ public class RoomMemberMapperTest {
 
     @Test
     public void count() {
-        System.out.println(roomMemberMapper.count("1", "1"));
+        System.out.println(roomMemberMapper.count(1, "1"));
     }
 
     @Test
     public void getRM() {
-        System.out.println(roomMemberMapper.getState("1", "1"));
+        System.out.println(roomMemberMapper.getState(1, "1"));
     }
 
     @Test
     @Rollback
     public void create() {
-        RoomMember roomMember = new RoomMember("1", "1",
+        RoomMember roomMember = new RoomMember(1, "1",
                 new Date(new java.util.Date().getTime()));
         System.out.println(roomMemberMapper.join(roomMember));
         System.out.println(roomMember.getId());
     }
     @Test
     public void listAll(){
-        for (RoomMember roomMember : roomMemberMapper.listAll("1")) {
+        for (RoomMember roomMember : roomMemberMapper.listAll(1)) {
             System.out.println(roomMember.getUid());
         }
     }

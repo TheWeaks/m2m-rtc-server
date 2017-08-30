@@ -29,6 +29,7 @@ import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
 import the.weaks.rtc.groupcall.exception.PermissionDeniedException;
+import the.weaks.rtc.groupcall.exception.RoomNotExistException;
 import the.weaks.rtc.groupcall.exception.UserNotFoundException;
 import the.weaks.rtc.groupcall.module.User;
 import the.weaks.rtc.groupcall.service.HistoryService;
@@ -111,6 +112,13 @@ public class CallHandler extends TextWebSocketHandler {
             error.add("message", jsonMessage);
             session.sendMessage(new TextMessage(error.toString()));
             e.printStackTrace();
+        } catch (RoomNotExistException e) {
+            log.warn(e.getMessage());
+            JsonObject error = new JsonObject();
+            error.addProperty("type", "roomNotExist");
+            error.addProperty("roomId", e.getRoomId());
+            session.sendMessage(new TextMessage(error.toString()));
+            session.close();
         }
     }
 
@@ -120,7 +128,7 @@ public class CallHandler extends TextWebSocketHandler {
         if (user != null)
             try {
                 leaveRoom(user);
-                historyService.logHistory(user.getUserId().toString(),user.getRoomId().toString(),-1);
+                historyService.logHistory(user.getUserId().toString(), user.getRoomId(), -1);
             } catch (Throwable e) {
                 e.printStackTrace();
             }
@@ -128,7 +136,7 @@ public class CallHandler extends TextWebSocketHandler {
 
     }
 
-    private void joinRoom(JsonObject params, WebSocketSession session) throws IOException {
+    private void joinRoom(JsonObject params, WebSocketSession session) throws IOException, RoomNotExistException {
         final Number roomId = params.get("room").getAsNumber();
         final Number userId = params.get("userId").getAsNumber();
         log.info("PARTICIPANT {}: trying to join room {}", userId, roomId);
@@ -137,7 +145,7 @@ public class CallHandler extends TextWebSocketHandler {
             roomManager.checkExist(roomId, userId);
             final UserSession user = roomManager.getRoom(roomId).join(u, session);
             registry.register(user);
-            historyService.logHistory(user.getUserId().toString(),user.getRoomId().toString(),1);
+            historyService.logHistory(user.getUserId().toString(), user.getRoomId(), 1);
         } catch (UserNotFoundException e) {
             log.warn(e.getMessage());
             JsonObject error = new JsonObject();
@@ -156,33 +164,35 @@ public class CallHandler extends TextWebSocketHandler {
         }
     }
 
-    private void leaveRoom(UserSession user) throws IOException {
-        final RoomSession roomSession = roomManager.getRoom(user.getRoomId());
+    private void leaveRoom(UserSession user) throws IOException, RoomNotExistException {
+        final RoomSession roomSession;
+        roomSession = roomManager.getRoom(user.getRoomId());
         roomSession.leave(user);
         if (roomSession.getParticipants().isEmpty()) {
             roomManager.pauseRoom(roomSession);
         }
 
+
     }
 
-    private void sendMessage(UserSession user, JsonObject message) throws IOException {
+    private void sendMessage(UserSession user, JsonObject message) throws IOException, RoomNotExistException {
         final RoomSession roomSession = roomManager.getRoom(user.getRoomId());
         final String msg = message.get("message").getAsString();
         final Number userId = user.getUserId();
         roomSession.sendMessage(userId, msg);
-        historyService.logHistory(user.getUserId().toString(),user.getRoomId().toString(),0,msg);
+        historyService.logHistory(user.getUserId().toString(), user.getRoomId(), 0, msg);
     }
 
-    private void sendFileURL(UserSession user, JsonObject message) throws IOException {
+    private void sendFileURL(UserSession user, JsonObject message) throws IOException, RoomNotExistException {
         final RoomSession roomSession = roomManager.getRoom(user.getRoomId());
         final String fileName = message.get("fileName").getAsString();
         final String fileUrl = message.get("fileUrl").getAsString();
         final String fileType = message.get("fileType").getAsString();
         String fid = roomSession.sendFileURL(user.getUserId(), fileName, fileUrl, fileType);
-        historyService.logHistory(user.getUserId().toString(),user.getRoomId().toString(),0,fid);
+        historyService.logHistory(user.getUserId().toString(), user.getRoomId(), 0, fid);
     }
 
-    private void broadcast(JsonObject object, UserSession user) throws IOException {
+    private void broadcast(JsonObject object, UserSession user) throws IOException, RoomNotExistException {
         final RoomSession roomSession = roomManager.getRoom(user.getRoomId());
         roomSession.broadcast(object);
     }

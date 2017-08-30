@@ -14,6 +14,6 @@ import the.weaks.rtc.groupcall.module.History;
 @Component
 @Mapper
 public interface HistoryMapper {
-    @Insert("INSERT INTO History VALUES (#{id},#{rid},#{uid},#{date},#{htype},#{message})")
+    @Insert("INSERT INTO History VALUES (#{id},#{rid},#{uid},#{date},#{hType},#{message})")
     int logHistory(History history);
 }

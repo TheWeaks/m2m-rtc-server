@@ -9,7 +9,7 @@ package the.weaks.rtc.groupcall.module;
 public class FileInfo {
     private String fid;
     private String uid;
-    private String rid;
+    private Integer rid;
     private String ftype;
     private String fname;
     private String url;
@@ -30,11 +30,15 @@ public class FileInfo {
         this.uid = uid;
     }
 
-    public String getRid() {
+    public Integer getRid() {
         return rid;
     }
 
-    public void setRid(String rid) {
+    public void setRid(Number rid) {
+        this.rid = rid.intValue();
+    }
+
+    public void setRid(Integer rid) {
         this.rid = rid;
     }
 

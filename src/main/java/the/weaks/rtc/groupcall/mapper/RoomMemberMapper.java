@@ -17,14 +17,14 @@ import the.weaks.rtc.groupcall.module.RoomMember;
 @Component
 public interface RoomMemberMapper {
     @Select("SELECT count(*)  FROM RoomMember WHERE rid=#{rid} AND uid=#{uid}")
-    Long count(@Param("rid") String rid, @Param("uid") String uid);
+    Long count(@Param("rid") Integer rid, @Param("uid") String uid);
 
     @Select("SELECT rmstate  FROM RoomMember WHERE rid=#{rid} AND uid=#{uid}")
-    Integer getState(@Param("rid") String rid, @Param("uid") String uid);
+    Integer getState(@Param("rid") Integer rid, @Param("uid") String uid);
 
     @Insert("INSERT RoomMember(rid, uid, jointime, rmstate) VALUES (#{rid}, #{uid}, #{jointime}, #{rmstate})")
     int join(RoomMember roomMember);
 
     @Select("SELECT * from RoomMember WHERE rid=#{rid}")
-    RoomMember[] listAll(@Param("rid")String rid);
+    RoomMember[] listAll(@Param("rid") Integer rid);
 }

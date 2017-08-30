@@ -32,14 +32,18 @@ public class RoomMapperTest {
         Room room = roomMapper.findByRid("1");
         System.out.println(room);
     }
+
     @Test
     public void findByOrderNum() throws Exception {
         Room room = roomMapper.findByOrderNum("1");
         System.out.println(room);
     }
+
     @Test
-    public void createRoom() throws Exception {
-        int num  = roomMapper.createRoom(UUID.randomUUID().toString(), new Date(new java.util.Date().getTime()),1);
+    public void createRoom2() throws Exception {
+        Room room = new Room(UUID.randomUUID().toString(), new Date(new java.util.Date().getTime()), 1);
+        int num = roomMapper.createRoom(room);
         System.out.println(num);
+        System.out.println(room.getRoomId());
     }
 }

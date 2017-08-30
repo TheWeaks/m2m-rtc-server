@@ -33,7 +33,7 @@ public class FileMapperTest {
         fileInfo.setFname(UUID.randomUUID().toString());
         fileInfo.setUrl(UUID.randomUUID().toString());
         fileInfo.setUid("1");
-        fileInfo.setRid("1");
+        fileInfo.setRid(1);
         fileMapper.newFileLog(fileInfo);
     }
     @Test

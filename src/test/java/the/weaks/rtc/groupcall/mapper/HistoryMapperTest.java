@@ -31,7 +31,7 @@ public class HistoryMapperTest {
     @Test
     public void logHistory() throws Exception {
         History history = new History();
-        history.setRid("1");
+        history.setRid(1);
         history.setUid("1");
         history.setDate(new java.sql.Date(new Date().getTime()));
         historyMapper.logHistory(history);
